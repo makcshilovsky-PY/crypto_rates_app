@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 import requests
+from datetime import datetime
 
 # Список монет и их ID в API CoinGecko
 coins = {
@@ -32,35 +33,44 @@ def show_price():
     selected_coin = combo.get()
     if not selected_coin:
         result_label.config(text="Выберите монету из списка!")
+        time_label.config(text="")
         return
 
     coin_id = coins[selected_coin]
     result_label.config(text="Загрузка...")
+    time_label.config(text="")
     window.update()
 
     price = get_crypto_price(coin_id)
     result_label.config(text=f"Курс {selected_coin}: {price}")
 
+    if "$" in price:
+        current_time = datetime.now().strftime("%H:%M:%S")
+        time_label.config(text=f"Обновлено в {current_time}")
+
 
 # ------------ Окно ------------
 window = tk.Tk()
 window.title("Курсы криптовалют")
-window.geometry("350x250")
+window.geometry("360x280")
 window.configure(bg="#f0f0f0")
 
 style = ttk.Style()
 style.theme_use('classic')
 
-title_label = tk.Label(window, text="Курс криптовалюты", font=("Arial", 14), bg="#f0f0f0")
+title_label = tk.Label(window, text="Курс криптовалюты", font=("Arial", 14, "bold"), bg="#f0f0f0")
 title_label.pack(pady=15)
 
-combo = ttk.Combobox(window, values=list(coins.keys()))
+combo = ttk.Combobox(window, values=list(coins.keys()), state="readonly")
 combo.pack(pady=5)
 
-button = tk.Button(window, text="Получить курс", command=show_price, bg="#f0f0f0", fg="black")
+button = tk.Button(window, text="Получить курс", command=show_price, bg="#e1e1e1", fg="black", relief="raised")
 button.pack(pady=10)
 
-result_label = tk.Label(window, text="", font=("Arial", 12), bg="#f0f0f0")
-result_label.pack(pady=10)
+result_label = tk.Label(window, text="", font=("Arial", 12, "bold"), bg="#f0f0f0")
+result_label.pack(pady=5)
+
+time_label = tk.Label(window, text="", font=("Arial", 9), fg="gray", bg="#f0f0f0")
+time_label.pack(pady=5)
 
 window.mainloop()
