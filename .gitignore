@@ -1,10 +1,5 @@
-# Виртуальное окружение
+__pycache__/
+.idea/
 .venv/
 venv/
-
-# Настройки PyCharm
-.idea/
-
-# Кэш Python
-__pycache__/
-*.pyc
+.DS_Store
