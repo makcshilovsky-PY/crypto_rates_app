@@ -1,7 +1,8 @@
 import tkinter as tk
 from tkinter import ttk
+import requests
 
-# Список монет, которые покажем в выпадающем списке
+# Список монет и их ID в API CoinGecko
 coins = {
     "Bitcoin": "bitcoin",
     "Ethereum": "ethereum",
@@ -11,10 +12,35 @@ coins = {
     "Ripple": "ripple",
 }
 
+
+def get_crypto_price(coin_id):
+    """Запрос курса с API CoinGecko"""
+    url = f"https://api.coingecko.com/api/v3/simple/price?ids={coin_id}&vs_currencies=usd"
+    try:
+        response = requests.get(url, timeout=5)
+        data = response.json()
+        if coin_id in data:
+            price = data[coin_id]['usd']
+            return f"${price:,.2f}"
+        else:
+            return "Ошибка данных"
+    except Exception:
+        return "Ошибка сети"
+
+
 def show_price():
-    # Пока только проверяем, что кнопка работает
-    coin_name = combo.get()
-    result_label.config(text="Выбрано: " + coin_name)
+    selected_coin = combo.get()
+    if not selected_coin:
+        result_label.config(text="Выберите монету из списка!")
+        return
+
+    coin_id = coins[selected_coin]
+    result_label.config(text="Загрузка...")
+    window.update()
+
+    price = get_crypto_price(coin_id)
+    result_label.config(text=f"Курс {selected_coin}: {price}")
+
 
 # ------------ Окно ------------
 window = tk.Tk()
@@ -22,7 +48,6 @@ window.title("Курсы криптовалют")
 window.geometry("350x250")
 window.configure(bg="#f0f0f0")
 
-# Фикс для macOS, чтобы не было белого текста на белом фоне
 style = ttk.Style()
 style.theme_use('classic')
 
